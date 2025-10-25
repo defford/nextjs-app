@@ -48,7 +48,12 @@ export default function Navigation() {
     if (item.href) {
       window.location.href = item.href;
     } else {
-      scrollToSection(item.id);
+      // For main page sections, navigate to homepage first, then scroll
+      if (window.location.pathname !== '/') {
+        window.location.href = `/#${item.id}`;
+      } else {
+        scrollToSection(item.id);
+      }
     }
   };
 

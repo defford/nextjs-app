@@ -1,9 +1,11 @@
 import SocialCard from '../../components/SocialCard';
+import Navigation from '../../components/Navigation';
 
 export default function SocialPage() {
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      <Navigation />
       <div className="min-h-screen flex flex-col xl:flex-row xl:items-center">
         {/* Banner Image - Centered on Screen */}
         <div 

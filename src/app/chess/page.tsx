@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
+import Navigation from '@/components/Navigation';
+import Pusher from 'pusher-js';
 
 interface GameState {
   fen: string;
@@ -19,27 +21,6 @@ export default function ChessPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMakingMove, setIsMakingMove] = useState(false);
-
-  const fetchGameState = useCallback(async () => {
-    try {
-      const response = await fetch('/api/chess', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'getGameState' })
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch game state');
-      
-      const data = await response.json();
-      setGameState(data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load game state');
-      console.error('Error fetching game state:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   const makeMove = useCallback(async (move: string) => {
     if (isMakingMove) return;
@@ -87,12 +68,74 @@ export default function ChessPage() {
     }
   }, []);
 
+  const fetchGameState = useCallback(async () => {
+    try {
+      const response = await fetch('/api/chess', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch game state');
+      
+      const data = await response.json();
+      setGameState(data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load game state');
+      console.error('Error fetching game state:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchGameState();
     
-    // Poll for game state updates every 2 seconds
-    const interval = setInterval(fetchGameState, 2000);
-    return () => clearInterval(interval);
+    // Set up Pusher for real-time updates
+    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
+    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'us2';
+    
+    console.log('Pusher Key:', pusherKey);
+    console.log('Pusher Cluster:', pusherCluster);
+    
+    if (!pusherKey) {
+      console.error('PUSHER_KEY is not defined');
+      return;
+    }
+    
+    const pusher = new Pusher(pusherKey, {
+      cluster: pusherCluster,
+    });
+
+    const channel = pusher.subscribe('chess-game');
+    
+    channel.bind('pusher:subscription_succeeded', () => {
+      console.log('Successfully subscribed to chess-game channel');
+    });
+    
+    channel.bind('pusher:subscription_error', (error: any) => {
+      console.error('Subscription error:', error);
+    });
+
+    // Listen for move events from other clients
+    channel.bind('move-made', (data: GameState) => {
+      console.log('Received move-made event:', data);
+      console.log('Updating gameState from:', gameState?.fen, 'to:', data.fen);
+      setGameState(data);
+      setError(null);
+    });
+
+    // Listen for game reset events
+    channel.bind('game-reset', (data: GameState) => {
+      console.log('Received game-reset event:', data);
+      setGameState(data);
+      setError(null);
+    });
+
+    return () => {
+      pusher.unsubscribe('chess-game');
+      pusher.disconnect();
+    };
   }, [fetchGameState]);
 
   const handlePieceDrop = ({ piece, sourceSquare, targetSquare }: { piece: any; sourceSquare: string; targetSquare: string | null }) => {
@@ -126,6 +169,7 @@ export default function ChessPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+      <Navigation />
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
@@ -145,6 +189,7 @@ export default function ChessPage() {
                   <div className="w-full max-w-md">
                     {gameState && (
                       <Chessboard
+                        key={gameState.fen} // Force re-render when position changes
                         options={{
                           position: gameState.fen,
                           onPieceDrop: handlePieceDrop,

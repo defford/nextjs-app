@@ -1,4 +1,5 @@
 import Navigation from '@/components/Navigation';
+import HashNavigation from '@/components/HashNavigation';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
 import Projects from '@/components/Projects';
@@ -9,6 +10,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Navigation />
+      <HashNavigation />
       <main>
         <Hero />
         <About />

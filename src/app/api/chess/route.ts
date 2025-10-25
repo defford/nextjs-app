@@ -1,38 +1,31 @@
 import { NextRequest } from 'next/server';
 import { Chess } from 'chess.js';
+import pusher from '@/lib/pusher';
 
 // Global game state
 let game = new Chess();
 
 export async function GET(req: NextRequest) {
-  // This is a placeholder for WebSocket upgrade
-  // In a real implementation, you'd need to handle the WebSocket upgrade
-  return new Response('WebSocket endpoint', { status: 200 });
+  return Response.json({
+    fen: game.fen(),
+    turn: game.turn(),
+    isGameOver: game.isGameOver(),
+    isCheck: game.isCheck(),
+    isCheckmate: game.isCheckmate(),
+    isStalemate: game.isStalemate(),
+    moveHistory: game.history()
+  });
 }
 
-// For development, we'll use a simple polling approach instead of WebSockets
-// This is more compatible with Next.js App Router
 export async function POST(req: NextRequest) {
   try {
     const { action, move } = await req.json();
-    
-    if (action === 'getGameState') {
-      return Response.json({
-        fen: game.fen(),
-        turn: game.turn(),
-        isGameOver: game.isGameOver(),
-        isCheck: game.isCheck(),
-        isCheckmate: game.isCheckmate(),
-        isStalemate: game.isStalemate(),
-        moveHistory: game.history()
-      });
-    }
     
     if (action === 'makeMove' && move) {
       try {
         const result = game.move(move);
         if (result) {
-          return Response.json({
+          const gameState = {
             success: true,
             fen: game.fen(),
             turn: game.turn(),
@@ -42,7 +35,13 @@ export async function POST(req: NextRequest) {
             isStalemate: game.isStalemate(),
             moveHistory: game.history(),
             lastMove: result
-          });
+          };
+
+          // Broadcast the move to all connected clients
+          console.log('Broadcasting move-made event:', gameState);
+          await pusher.trigger('chess-game', 'move-made', gameState);
+
+          return Response.json(gameState);
         } else {
           return Response.json({ success: false, error: 'Invalid move' });
         }
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
     
     if (action === 'resetGame') {
       game = new Chess();
-      return Response.json({
+      const gameState = {
         success: true,
         fen: game.fen(),
         turn: game.turn(),
@@ -62,7 +61,13 @@ export async function POST(req: NextRequest) {
         isCheckmate: game.isCheckmate(),
         isStalemate: game.isStalemate(),
         moveHistory: game.history()
-      });
+      };
+
+      // Broadcast the game reset to all connected clients
+      console.log('Broadcasting game-reset event:', gameState);
+      await pusher.trigger('chess-game', 'game-reset', gameState);
+
+      return Response.json(gameState);
     }
     
     return Response.json({ success: false, error: 'Invalid action' });

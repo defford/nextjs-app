@@ -31,6 +31,33 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Real-time Chess Setup
+
+The chess game uses Pusher Channels for real-time move synchronization across multiple browsers.
+
+### Environment Setup
+
+1. Create a Pusher app at [https://dashboard.pusher.com/](https://dashboard.pusher.com/)
+2. Copy `env.example` to `.env.local`
+3. Fill in your Pusher credentials:
+
+```bash
+cp env.example .env.local
+```
+
+Required environment variables:
+- `PUSHER_APP_ID` - Your Pusher app ID
+- `PUSHER_KEY` - Your Pusher key
+- `PUSHER_SECRET` - Your Pusher secret
+- `PUSHER_CLUSTER` - Your Pusher cluster (default: us2)
+- `NEXT_PUBLIC_PUSHER_KEY` - Same as PUSHER_KEY (for client-side)
+- `NEXT_PUBLIC_PUSHER_CLUSTER` - Same as PUSHER_CLUSTER (for client-side)
+
+### How it Works
+
+- **Before**: Client polls API every 500ms for updates
+- **After**: Client makes move → API updates state → Pusher broadcasts to all connected clients instantly
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
