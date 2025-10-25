@@ -32,7 +32,8 @@ export default function Navigation() {
     { id: 'about', label: 'About' },
     { id: 'projects', label: 'Projects' },
     { id: 'skills', label: 'Skills' },
-    { id: 'contact', label: 'Contact' }
+    { id: 'contact', label: 'Contact' },
+    { id: 'chess', label: 'Chess', href: '/chess' }
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -41,6 +42,14 @@ export default function Navigation() {
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMenuOpen(false);
+  };
+
+  const handleNavClick = (item: any) => {
+    if (item.href) {
+      window.location.href = item.href;
+    } else {
+      scrollToSection(item.id);
+    }
   };
 
   return (
@@ -59,7 +68,7 @@ export default function Navigation() {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                onClick={() => handleNavClick(item)}
                 className={`text-sm font-medium transition-colors ${
                   activeSection === item.id
                     ? 'text-zinc-900 dark:text-zinc-100'
@@ -93,7 +102,7 @@ export default function Navigation() {
               {navItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => handleNavClick(item)}
                   className={`text-left px-4 py-2 text-sm font-medium transition-colors ${
                     activeSection === item.id
                       ? 'text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800'
