@@ -15,8 +15,13 @@ export default function About() {
         
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="animate-slide-in-left">
-            <div className="w-80 h-80 mx-auto bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center mb-8">
-              <span className="text-6xl text-zinc-500 dark:text-zinc-400">👨‍💻</span>
+            <div className="w-80 h-80 mx-auto rounded-full overflow-hidden mb-8 shadow-2xl">
+              <img 
+                src="/defford-selfie.jpg" 
+                alt="Daniel Efford" 
+                className="w-full h-full object-cover"
+                style={{ objectPosition: 'center 30%' }}
+              />
             </div>
           </div>
           

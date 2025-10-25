@@ -22,7 +22,7 @@ export default function Projects() {
             >
               <div className="p-6">
                 <div className="w-full h-48 bg-zinc-200 dark:bg-zinc-700 rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-4xl text-zinc-500 dark:text-zinc-400">🚀</span>
+                  <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
                 </div>
                 
                 <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">

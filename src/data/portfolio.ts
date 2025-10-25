@@ -33,7 +33,7 @@ export interface PersonalInfo {
 }
 
 export const personalInfo: PersonalInfo = {
-  greeting: "Hey, I'm Daniel 👋",
+  greeting: "Hey, I'm Daniel!",
   name: "Daniel Efford",
   title: "Software Engineer, AI Enthusiast, Chess Coach",
   bio: "Practical and efficient problem solver. Always eager to help others and take on a new challenge.",
@@ -55,22 +55,12 @@ export const projects: Project[] = [
     description: "A chess club website that manages members, organizes tournmants, and provides resources for the club to learn to play chess.",
     longDescription: "I created a chess club website that manages members, organizes tournmants, and provides resources for the club to learn to play chess. I used NextJS and Vercel to build a fast and responsive chess club management system.",
     techStack: ["Next.js", "TypeScript", "Tailwind CSS", "Google Sheets API", "Redis Cache", "Vercel"],
-    imageUrl: "/chess-club-website.jpg",
+    imageUrl: "/chess-club-website.png",
     liveUrl: "https://cnlscc.com",
     githubUrl: "https://github.com/defford/chess-club-website",
     featured: false
   },
-  {
-    id: "project-3",
-    title: "Weather Dashboard",
-    description: "Interactive weather dashboard with location-based forecasts.",
-    longDescription: "Created a responsive weather dashboard with location detection, 7-day forecasts, and interactive charts. Integrated with multiple weather APIs for accurate data.",
-    techStack: ["Vue.js", "Chart.js", "Weather API", "CSS3"],
-    imageUrl: "/project3.jpg",
-    liveUrl: "https://your-weather-app.com",
-    githubUrl: "https://github.com/yourusername/weather-dashboard",
-    featured: false
-  }
+
 ];
 
 export const skills: Skill[] = [
